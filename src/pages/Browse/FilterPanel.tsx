@@ -1,3 +1,4 @@
+import { useT } from '../../lib/i18n/index.ts';
 import type {
   BedsFilter,
   Filters,
@@ -10,20 +11,22 @@ interface FilterPanelProps {
   onChange: (filters: Filters) => void;
 }
 
+/** label is a literal ("2"), labelKey an i18n key; exactly one is set. */
 interface Option<T extends string> {
   value: T;
-  label: string;
+  label?: string;
+  labelKey?: string;
 }
 
 const SIZE_OPTIONS: Option<SizeFilter>[] = [
-  { value: 'any', label: 'Any' },
-  { value: 'small', label: 'Small · 40–60 m²' },
-  { value: 'medium', label: 'Medium · 60–90 m²' },
-  { value: 'large', label: 'Large · 90–120 m²' },
+  { value: 'any', labelKey: 'ui.any' },
+  { value: 'small', labelKey: 'ui.sizeSmall' },
+  { value: 'medium', labelKey: 'ui.sizeMedium' },
+  { value: 'large', labelKey: 'ui.sizeLarge' },
 ];
 
 const BEDS_OPTIONS: Option<BedsFilter>[] = [
-  { value: 'any', label: 'Any' },
+  { value: 'any', labelKey: 'ui.any' },
   { value: '1', label: '1' },
   { value: '2', label: '2' },
   { value: '3', label: '3' },
@@ -31,9 +34,9 @@ const BEDS_OPTIONS: Option<BedsFilter>[] = [
 ];
 
 const FLOORS_OPTIONS: Option<FloorsFilter>[] = [
-  { value: 'any', label: 'Any' },
-  { value: '1', label: '1 floor' },
-  { value: 'attic', label: 'Ground + attic' },
+  { value: 'any', labelKey: 'ui.any' },
+  { value: '1', labelKey: 'ui.oneFloor' },
+  { value: 'attic', labelKey: 'ui.groundAttic' },
 ];
 
 function ToggleGroup<T extends string>(props: {
@@ -42,10 +45,11 @@ function ToggleGroup<T extends string>(props: {
   value: T;
   onSelect: (value: T) => void;
 }) {
+  const t = useT();
   return (
     <fieldset>
       <legend>{props.legend}</legend>
-      <div className="toggle" role="radiogroup" aria-label={props.legend}>
+      <div className="toggle filter-toggle" role="radiogroup" aria-label={props.legend}>
         {props.options.map((option) => (
           <button
             key={option.value}
@@ -55,7 +59,7 @@ function ToggleGroup<T extends string>(props: {
             className={option.value === props.value ? 'active' : ''}
             onClick={() => props.onSelect(option.value)}
           >
-            {option.label}
+            {option.label ?? t(option.labelKey!)}
           </button>
         ))}
       </div>
@@ -64,23 +68,23 @@ function ToggleGroup<T extends string>(props: {
 }
 
 export default function FilterPanel({ filters, onChange }: FilterPanelProps) {
+  const t = useT();
   return (
     <aside className="filter-panel">
-      <h1>WoodPlan</h1>
       <ToggleGroup
-        legend="Size"
+        legend={t('ui.size')}
         options={SIZE_OPTIONS}
         value={filters.size}
         onSelect={(size) => onChange({ ...filters, size })}
       />
       <ToggleGroup
-        legend="Bedrooms"
+        legend={t('ui.bedrooms')}
         options={BEDS_OPTIONS}
         value={filters.beds}
         onSelect={(beds) => onChange({ ...filters, beds })}
       />
       <ToggleGroup
-        legend="Floors"
+        legend={t('ui.floors')}
         options={FLOORS_OPTIONS}
         value={filters.floors}
         onSelect={(floors) => onChange({ ...filters, floors })}

@@ -1,3 +1,4 @@
+import { translate, type Lang } from '../i18n/index.ts';
 import type {
   Floor,
   Opening,
@@ -34,6 +35,21 @@ export interface RenderOptions {
   showFurniture?: boolean;
   /** Color theme. Default 'wood'. */
   theme?: 'wood' | 'mono';
+  /**
+   * Horizontal mirror (issue #6). Implemented as a reflection of the
+   * per-floor projection — the visual equivalent of scale(-1,1) + translate
+   * on the plan graphics, except text stays upright and readable. The
+   * template's polygons are NEVER touched (cosmetic only, decision #11);
+   * door swings and dimension lines come out correctly mirrored because
+   * they are computed in screen space.
+   */
+  mirrored?: boolean;
+  /**
+   * Cosmetic room renames (issue #6): room id -> display label, overriding
+   * the labelKey translation. Lives in customization state only; never
+   * written back to template data.
+   */
+  labelOverrides?: Record<string, string>;
 }
 
 export interface Theme {
@@ -50,41 +66,9 @@ export const THEMES: Record<'wood' | 'mono', Theme> = {
 
 /* -------------------------------------------------------------------------
  * Localization
- * Templates store i18n label KEYS; the renderer resolves them. This table is
- * the interim dictionary until real i18n lands (issue #6).
+ * Templates store i18n label KEYS; the renderer resolves them through the
+ * shared i18n dictionaries (../i18n), so the SVG always agrees with the UI.
  * ---------------------------------------------------------------------- */
-
-type Lang = 'sq' | 'en';
-
-const ROOM_LABELS: Record<string, Record<Lang, string>> = {
-  'room.living': { sq: 'Dhoma e ndenjes', en: 'Living room' },
-  'room.kitchen': { sq: 'Kuzhina', en: 'Kitchen' },
-  'room.bedroom': { sq: 'Dhoma e gjumit', en: 'Bedroom' },
-  'room.bathroom': { sq: 'Banjo', en: 'Bathroom' },
-  'room.hall': { sq: 'Korridori', en: 'Hallway' },
-  'room.storage': { sq: 'Depoja', en: 'Storage' },
-  'room.wc': { sq: 'WC', en: 'WC' },
-  'room.other': { sq: 'Dhomë', en: 'Room' },
-};
-
-const FLOOR_LABELS: Record<Floor['level'], Record<Lang, string>> = {
-  ground: { sq: 'Përdhesa', en: 'Ground floor' },
-  attic: { sq: 'Papafingo', en: 'Attic' },
-};
-
-/** Shown in both languages regardless of `lang`; this is a legal notice. */
-const DISCLAIMER = {
-  en: 'Concept plan — not for construction or permits',
-  sq: 'Plan konceptual — jo për ndërtim ose leje',
-};
-
-function resolveLabel(labelKey: string, lang: Lang): string {
-  const entry = ROOM_LABELS[labelKey];
-  if (entry) return entry[lang];
-  // Unknown key: humanize the last key segment so authoring drafts still label.
-  const tail = labelKey.split('.').pop() ?? labelKey;
-  return tail.charAt(0).toUpperCase() + tail.slice(1);
-}
 
 /* -------------------------------------------------------------------------
  * Geometry (plan space: integer cm, origin SW, y grows north)
@@ -168,6 +152,8 @@ export function renderTemplate(
   const showDimensions = options.showDimensions ?? true;
   const showAreaLabels = options.showAreaLabels ?? true;
   const theme = THEMES[options.theme ?? 'wood'];
+  const mirrored = options.mirrored ?? false;
+  const labelOverrides = options.labelOverrides ?? {};
 
   /** meters -> px */
   const px = (m: number) => m * scale;
@@ -196,18 +182,22 @@ export function renderTemplate(
   template.floors.forEach((floor, i) => {
     const b = floorBounds[i];
     // Plan -> screen transform for this floor (flip y: plan y grows north).
-    const X = (x: number) => px(originXM) + (x - b.minX) * k;
+    // When mirrored, x is reflected here in the projection instead of via an
+    // SVG scale(-1,1) group, so labels render upright in one pass.
+    const X = mirrored
+      ? (x: number) => px(originXM) + (b.maxX - x) * k
+      : (x: number) => px(originXM) + (x - b.minX) * k;
     const Y = (y: number) => px(PAD_TOP_M) + (b.maxY - y) * k;
 
     parts.push(`<g class="floor" data-floor-id="${escapeXml(floor.id)}">`);
     renderFootprint(parts, floor, X, Y, px, theme);
     renderRooms(parts, floor, X, Y, px, theme);
     renderOpenings(parts, floor, X, Y, k, px, theme);
-    renderRoomLabels(parts, floor, X, Y, px, theme, lang, showAreaLabels);
+    renderRoomLabels(parts, floor, X, Y, px, theme, lang, showAreaLabels, labelOverrides);
     if (showDimensions) renderDimensions(parts, b, X, Y, px, theme);
     if (template.floors.length > 1) {
       parts.push(
-        `<text class="floor-caption" x="${n((X(b.minX) + X(b.maxX)) / 2)}" y="${n(Y(b.minY) + px(0.7))}" text-anchor="middle" font-size="${n(px(0.3))}" fill="${theme.text}">${escapeXml(FLOOR_LABELS[floor.level][lang])}</text>`,
+        `<text class="floor-caption" x="${n((X(b.minX) + X(b.maxX)) / 2)}" y="${n(Y(b.minY) + px(0.7))}" text-anchor="middle" font-size="${n(px(0.3))}" fill="${theme.text}">${escapeXml(translate(lang, `floor.${floor.level}`))}</text>`,
       );
     }
     parts.push('</g>');
@@ -331,12 +321,14 @@ function renderRoomLabels(
   theme: Theme,
   lang: Lang,
   showAreaLabels: boolean,
+  labelOverrides: Record<string, string>,
 ): void {
   for (const room of floor.rooms) {
     const b = bounds(room.polygon);
     const cx = (X(b.minX) + X(b.maxX)) / 2;
     const cy = (Y(b.minY) + Y(b.maxY)) / 2;
-    const name = escapeXml(resolveLabel(room.labelKey, lang));
+    const override = labelOverrides[room.id];
+    const name = escapeXml(override !== undefined && override !== '' ? override : translate(lang, room.labelKey));
     parts.push(
       `<text class="room-label" x="${n(cx)}" y="${n(cy - px(0.06))}" text-anchor="middle" font-size="${n(px(0.32))}" fill="${theme.text}">${name}</text>`,
     );
@@ -362,18 +354,23 @@ function renderDimensions(
   const font = n(px(0.28));
   const d: string[] = [`<g class="dimensions" stroke="${theme.text}" stroke-width="${sw}">`];
 
+  // Use screen-space extremes: under a mirrored projection X(b.minX) is the
+  // RIGHT edge, but the dimension lines must stay on the same axes either way.
+  const sxMin = Math.min(X(b.minX), X(b.maxX));
+  const sxMax = Math.max(X(b.minX), X(b.maxX));
+
   // Top axis (width)
   const ty = Y(b.maxY) - px(DIM_OFFSET_M);
-  d.push(`<line x1="${n(X(b.minX))}" y1="${n(ty)}" x2="${n(X(b.maxX))}" y2="${n(ty)}"/>`);
-  for (const x of [X(b.minX), X(b.maxX)]) {
+  d.push(`<line x1="${n(sxMin)}" y1="${n(ty)}" x2="${n(sxMax)}" y2="${n(ty)}"/>`);
+  for (const x of [sxMin, sxMax]) {
     d.push(`<line x1="${n(x)}" y1="${n(ty - tick)}" x2="${n(x)}" y2="${n(ty + tick)}"/>`);
   }
   d.push(
-    `<text x="${n((X(b.minX) + X(b.maxX)) / 2)}" y="${n(ty - px(0.14))}" text-anchor="middle" font-size="${font}" fill="${theme.text}" stroke="none">${escapeXml(fmtMeters(b.maxX - b.minX))}</text>`,
+    `<text x="${n((sxMin + sxMax) / 2)}" y="${n(ty - px(0.14))}" text-anchor="middle" font-size="${font}" fill="${theme.text}" stroke="none">${escapeXml(fmtMeters(b.maxX - b.minX))}</text>`,
   );
 
   // Left axis (height)
-  const lx = X(b.minX) - px(DIM_OFFSET_M);
+  const lx = sxMin - px(DIM_OFFSET_M);
   d.push(`<line x1="${n(lx)}" y1="${n(Y(b.maxY))}" x2="${n(lx)}" y2="${n(Y(b.minY))}"/>`);
   for (const y of [Y(b.maxY), Y(b.minY)]) {
     d.push(`<line x1="${n(lx - tick)}" y1="${n(y)}" x2="${n(lx + tick)}" y2="${n(y)}"/>`);
@@ -430,10 +427,11 @@ function renderDisclaimer(
   px: (m: number) => number,
 ): void {
   const font = n(px(0.24));
+  // Shown in both languages regardless of `lang`; this is a legal notice.
   parts.push(
-    `<text class="disclaimer" x="${n(totalW / 2)}" y="${n(totalH - px(0.85))}" text-anchor="middle" font-size="${font}" fill="#888888">${escapeXml(DISCLAIMER.en)}</text>`,
+    `<text class="disclaimer" x="${n(totalW / 2)}" y="${n(totalH - px(0.85))}" text-anchor="middle" font-size="${font}" fill="#888888">${escapeXml(translate('en', 'disclaimer'))}</text>`,
   );
   parts.push(
-    `<text class="disclaimer" x="${n(totalW / 2)}" y="${n(totalH - px(0.45))}" text-anchor="middle" font-size="${font}" fill="#888888">${escapeXml(DISCLAIMER.sq)}</text>`,
+    `<text class="disclaimer" x="${n(totalW / 2)}" y="${n(totalH - px(0.45))}" text-anchor="middle" font-size="${font}" fill="#888888">${escapeXml(translate('sq', 'disclaimer'))}</text>`,
   );
 }

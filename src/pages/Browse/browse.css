@@ -1,28 +1,9 @@
-/* Browse page (issue #5). Same wood palette as the preview page. */
-:root {
-  --bg: #faf8f4;
-  --panel: #ffffff;
-  --border: #e0d8cc;
-  --text: #2c1810;
-  --accent: #8b6914;
-  --muted: #7a6a55;
-}
-
-* {
-  box-sizing: border-box;
-}
-
-body {
-  margin: 0;
-  font-family: system-ui, sans-serif;
-  color: var(--text);
-  background: var(--bg);
-}
+/* Browse page (issue #5). Palette + shared toggles come from styles.css. */
 
 .browse {
   display: grid;
   grid-template-columns: 280px 1fr;
-  min-height: 100vh;
+  min-height: calc(100vh - 53px); /* below the app header */
 }
 
 /* ----- filter panel ----- */
@@ -31,11 +12,6 @@ body {
   border-right: 1px solid var(--border);
   background: var(--panel);
   padding: 16px;
-}
-
-.filter-panel h1 {
-  font-size: 18px;
-  margin: 0 0 14px;
 }
 
 .filter-panel fieldset {
@@ -51,28 +27,12 @@ body {
   padding: 0 4px;
 }
 
-.toggle {
-  display: flex;
+.filter-toggle {
   flex-direction: column;
-  gap: 6px;
 }
 
-.toggle button {
-  padding: 7px 10px;
-  border: 1px solid var(--border);
-  border-radius: 5px;
-  background: var(--panel);
-  color: var(--text);
-  cursor: pointer;
-  font: inherit;
-  font-size: 13px;
+.filter-toggle button {
   text-align: left;
-}
-
-.toggle button.active {
-  background: var(--accent);
-  border-color: var(--accent);
-  color: #fff;
 }
 
 /* ----- grid + cards ----- */
@@ -137,45 +97,6 @@ body {
   color: var(--muted);
 }
 
-/* ----- detail placeholder (issue #6 replaces this) ----- */
-
-.template-detail {
-  max-width: 1100px;
-  margin: 0 auto;
-  padding: 20px;
-}
-
-.template-detail header {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  margin-bottom: 16px;
-}
-
-.template-detail h1 {
-  font-size: 17px;
-  margin: 0;
-}
-
-.template-detail header button {
-  padding: 7px 12px;
-  border: 1px solid var(--border);
-  border-radius: 5px;
-  background: var(--panel);
-  color: var(--text);
-  cursor: pointer;
-  font: inherit;
-  font-size: 13px;
-}
-
-.template-detail .plan svg {
-  max-width: 100%;
-  height: auto;
-  box-shadow: 0 2px 12px rgba(44, 24, 16, 0.12);
-  border-radius: 4px;
-  background: #fff;
-}
-
 /* ----- mobile: filters become a top bar ----- */
 
 @media (max-width: 720px) {
@@ -188,12 +109,12 @@ body {
     border-bottom: 1px solid var(--border);
   }
 
-  .toggle {
+  .filter-toggle {
     flex-direction: row;
     flex-wrap: wrap;
   }
 
-  .toggle button {
+  .filter-toggle button {
     flex: 1 1 auto;
     text-align: center;
   }

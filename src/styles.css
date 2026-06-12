@@ -1,0 +1,56 @@
+/* Global shell styles: palette, header, shared toggle groups. */
+:root {
+  --bg: #faf8f4;
+  --panel: #ffffff;
+  --border: #e0d8cc;
+  --text: #2c1810;
+  --accent: #8b6914;
+  --muted: #7a6a55;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: system-ui, sans-serif;
+  color: var(--text);
+  background: var(--bg);
+}
+
+.app-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 16px;
+  border-bottom: 1px solid var(--border);
+  background: var(--panel);
+}
+
+.app-header .brand {
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.toggle {
+  display: flex;
+  gap: 6px;
+}
+
+.toggle button {
+  padding: 7px 10px;
+  border: 1px solid var(--border);
+  border-radius: 5px;
+  background: var(--panel);
+  color: var(--text);
+  cursor: pointer;
+  font: inherit;
+  font-size: 13px;
+}
+
+.toggle button.active {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+}
