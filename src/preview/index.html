@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>WoodPlan — template preview</title>
+  <style>
+    :root {
+      --bg: #faf8f4;
+      --panel: #ffffff;
+      --border: #e0d8cc;
+      --text: #2c1810;
+      --accent: #8b6914;
+      --ok: #2e7d32;
+      --err: #c62828;
+      --soft: #b26a00;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: system-ui, sans-serif;
+      color: var(--text);
+      background: var(--bg);
+      display: grid;
+      grid-template-columns: 320px 1fr;
+      height: 100vh;
+    }
+    aside {
+      border-right: 1px solid var(--border);
+      background: var(--panel);
+      padding: 16px;
+      overflow-y: auto;
+    }
+    aside h1 { font-size: 16px; margin: 0 0 12px; }
+    fieldset {
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      margin: 0 0 14px;
+      padding: 10px 12px;
+    }
+    legend { font-size: 12px; color: #7a6a55; padding: 0 4px; }
+    #dropzone {
+      border: 2px dashed var(--border);
+      border-radius: 8px;
+      padding: 22px 12px;
+      text-align: center;
+      font-size: 13px;
+      color: #7a6a55;
+      margin-bottom: 14px;
+      transition: border-color 0.15s, background 0.15s;
+    }
+    #dropzone.dragover { border-color: var(--accent); background: #f5f0e8; }
+    #dropzone strong { color: var(--text); display: block; margin-bottom: 4px; }
+    #source-name { font-size: 12px; color: var(--accent); margin-top: 6px; word-break: break-all; }
+    .toggle { display: flex; gap: 6px; }
+    .toggle button {
+      flex: 1;
+      padding: 6px 0;
+      border: 1px solid var(--border);
+      border-radius: 5px;
+      background: var(--panel);
+      color: var(--text);
+      cursor: pointer;
+      font: inherit;
+      font-size: 13px;
+    }
+    .toggle button.active {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: #fff;
+    }
+    label[for="scale"] { font-size: 13px; }
+    input[type="range"] { width: 100%; accent-color: var(--accent); }
+    #scale-value { font-variant-numeric: tabular-nums; }
+    main { display: flex; flex-direction: column; overflow: hidden; }
+    #preview {
+      flex: 1;
+      overflow: auto;
+      padding: 20px;
+      display: grid;
+      place-items: center;
+    }
+    #preview svg {
+      max-width: 100%;
+      height: auto;
+      box-shadow: 0 2px 12px rgba(44, 24, 16, 0.12);
+      border-radius: 4px;
+    }
+    #validation {
+      border-top: 1px solid var(--border);
+      background: var(--panel);
+      padding: 12px 20px;
+      max-height: 32vh;
+      overflow-y: auto;
+      font-size: 13px;
+    }
+    #validation .ok { color: var(--ok); font-weight: 600; }
+    #validation .parse-error { color: var(--err); font-weight: 600; }
+    #validation ul { margin: 6px 0 0; padding-left: 18px; }
+    #validation li { margin: 2px 0; font-family: ui-monospace, monospace; font-size: 12px; }
+    #validation li.hard { color: var(--err); }
+    #validation li.soft { color: var(--soft); }
+  </style>
+</head>
+<body>
+  <aside>
+    <h1>WoodPlan preview</h1>
+    <div id="dropzone">
+      <strong>Drop a template .json here</strong>
+      Re-renders on every save while the tab stays open (Chromium browsers).
+      <div id="source-name">sample template</div>
+    </div>
+    <fieldset>
+      <legend>Language</legend>
+      <div class="toggle" id="lang-toggle">
+        <button type="button" data-lang="sq" class="active">Shqip</button>
+        <button type="button" data-lang="en">English</button>
+      </div>
+    </fieldset>
+    <fieldset>
+      <legend>Theme</legend>
+      <div class="toggle" id="theme-toggle">
+        <button type="button" data-theme="wood" class="active">Wood</button>
+        <button type="button" data-theme="mono">Mono</button>
+      </div>
+    </fieldset>
+    <fieldset>
+      <legend>Scale</legend>
+      <label for="scale"><span id="scale-value">50</span> px / m</label>
+      <input type="range" id="scale" min="25" max="100" step="5" value="50" />
+    </fieldset>
+  </aside>
+  <main>
+    <div id="preview"></div>
+    <div id="validation"></div>
+  </main>
+  <script type="module" src="./preview.ts"></script>
+</body>
+</html>
