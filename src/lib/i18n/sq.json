@@ -37,5 +37,10 @@
   "ui.roomNames": "Emrat e dhomave",
   "ui.roomNamesHint": "Vetëm emërtim — gjeometria nuk ndryshon kurrë.",
   "ui.furniture": "Mobiliet",
-  "ui.comingSoon": "Së shpejti"
+  "ui.comingSoon": "Së shpejti",
+  "ui.exportPdf": "Eksporto PDF",
+  "ui.exporting": "Duke eksportuar…",
+  "ui.room": "Dhoma",
+  "ui.area": "Sipërfaqja",
+  "ui.total": "Gjithsej"
 }

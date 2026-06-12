@@ -3,6 +3,7 @@ import { useTemplateCustomization } from '../../hooks/useTemplateCustomization.t
 import type { Template } from '../../lib/schema/template.schema.ts';
 import { metaLine } from '../Browse/TemplateCard.tsx';
 import CustomizationPanel from './CustomizationPanel.tsx';
+import ExportButton from './ExportButton.tsx';
 import PlanPreview from './PlanPreview.tsx';
 import './detail.css';
 
@@ -31,6 +32,7 @@ export default function Detail({ template, onBack }: DetailProps) {
           <h1>{t(template.nameKey)}</h1>
           <p className="meta">{metaLine(template, t)}</p>
         </div>
+        <ExportButton template={template} customization={customization} />
       </header>
       <div className="detail-body">
         <PlanPreview template={template} customization={customization} />

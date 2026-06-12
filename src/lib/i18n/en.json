@@ -37,5 +37,10 @@
   "ui.roomNames": "Room names",
   "ui.roomNamesHint": "Labels only — geometry never changes.",
   "ui.furniture": "Furniture",
-  "ui.comingSoon": "Coming soon"
+  "ui.comingSoon": "Coming soon",
+  "ui.exportPdf": "Export PDF",
+  "ui.exporting": "Exporting…",
+  "ui.room": "Room",
+  "ui.area": "Area",
+  "ui.total": "Total"
 }
