@@ -1,0 +1,112 @@
+{
+  "id": "tmpl-s02",
+  "nameKey": "template.s02.name",
+  "sizeBand": "40-60",
+  "declaredAreaM2": 57.6,
+  "declaredBedrooms": 2,
+  "floorConfig": "single",
+  "floors": [
+    {
+      "id": "ground",
+      "level": "ground",
+      "footprint": [
+        { "x": 0, "y": 0 },
+        { "x": 960, "y": 0 },
+        { "x": 960, "y": 600 },
+        { "x": 0, "y": 600 }
+      ],
+      "rooms": [
+        {
+          "id": "living",
+          "labelKey": "room.living",
+          "type": "living",
+          "polygon": [
+            { "x": 0, "y": 0 },
+            { "x": 420, "y": 0 },
+            { "x": 420, "y": 360 },
+            { "x": 0, "y": 360 }
+          ]
+        },
+        {
+          "id": "kitchen",
+          "labelKey": "room.kitchen",
+          "type": "kitchen",
+          "polygon": [
+            { "x": 0, "y": 360 },
+            { "x": 420, "y": 360 },
+            { "x": 420, "y": 600 },
+            { "x": 0, "y": 600 }
+          ]
+        },
+        {
+          "id": "hall",
+          "labelKey": "room.hall",
+          "type": "hall",
+          "polygon": [
+            { "x": 420, "y": 0 },
+            { "x": 540, "y": 0 },
+            { "x": 540, "y": 600 },
+            { "x": 420, "y": 600 }
+          ]
+        },
+        {
+          "id": "bedroom-2",
+          "labelKey": "room.bedroom",
+          "type": "bedroom",
+          "polygon": [
+            { "x": 540, "y": 0 },
+            { "x": 960, "y": 0 },
+            { "x": 960, "y": 240 },
+            { "x": 540, "y": 240 }
+          ]
+        },
+        {
+          "id": "bathroom",
+          "labelKey": "room.bathroom",
+          "type": "bathroom",
+          "polygon": [
+            { "x": 540, "y": 240 },
+            { "x": 960, "y": 240 },
+            { "x": 960, "y": 360 },
+            { "x": 540, "y": 360 }
+          ]
+        },
+        {
+          "id": "bedroom-1",
+          "labelKey": "room.bedroom",
+          "type": "bedroom",
+          "polygon": [
+            { "x": 540, "y": 360 },
+            { "x": 960, "y": 360 },
+            { "x": 960, "y": 600 },
+            { "x": 540, "y": 600 }
+          ]
+        }
+      ],
+      "walls": [
+        { "id": "w-ext-south", "from": { "x": 0, "y": 0 }, "to": { "x": 960, "y": 0 }, "kind": "exterior", "bearing": true, "thicknessCm": 20 },
+        { "id": "w-ext-east", "from": { "x": 960, "y": 0 }, "to": { "x": 960, "y": 600 }, "kind": "exterior", "bearing": true, "thicknessCm": 20 },
+        { "id": "w-ext-north", "from": { "x": 960, "y": 600 }, "to": { "x": 0, "y": 600 }, "kind": "exterior", "bearing": true, "thicknessCm": 20 },
+        { "id": "w-ext-west", "from": { "x": 0, "y": 600 }, "to": { "x": 0, "y": 0 }, "kind": "exterior", "bearing": true, "thicknessCm": 20 },
+        { "id": "w-int-hall-west", "from": { "x": 420, "y": 0 }, "to": { "x": 420, "y": 600 }, "kind": "interior", "thicknessCm": 10 },
+        { "id": "w-int-hall-east", "from": { "x": 540, "y": 0 }, "to": { "x": 540, "y": 600 }, "kind": "interior", "thicknessCm": 10 },
+        { "id": "w-int-living-kitchen", "from": { "x": 0, "y": 360 }, "to": { "x": 420, "y": 360 }, "kind": "interior", "thicknessCm": 10 },
+        { "id": "w-int-bed2-bath", "from": { "x": 540, "y": 240 }, "to": { "x": 960, "y": 240 }, "kind": "interior", "thicknessCm": 10 },
+        { "id": "w-int-bath-bed1", "from": { "x": 540, "y": 360 }, "to": { "x": 960, "y": 360 }, "kind": "interior", "thicknessCm": 10 }
+      ],
+      "openings": [
+        { "id": "door-entrance", "kind": "door", "wallId": "w-ext-south", "offsetCm": 430, "widthCm": 100 },
+        { "id": "door-living", "kind": "door", "wallId": "w-int-hall-west", "offsetCm": 120, "widthCm": 90 },
+        { "id": "door-kitchen", "kind": "door", "wallId": "w-int-hall-west", "offsetCm": 440, "widthCm": 90 },
+        { "id": "door-bedroom-2", "kind": "door", "wallId": "w-int-hall-east", "offsetCm": 75, "widthCm": 90 },
+        { "id": "door-bathroom", "kind": "door", "wallId": "w-int-hall-east", "offsetCm": 260, "widthCm": 80 },
+        { "id": "door-bedroom-1", "kind": "door", "wallId": "w-int-hall-east", "offsetCm": 440, "widthCm": 90 },
+        { "id": "win-living", "kind": "window", "wallId": "w-ext-west", "offsetCm": 330, "widthCm": 150 },
+        { "id": "win-kitchen", "kind": "window", "wallId": "w-ext-west", "offsetCm": 60, "widthCm": 120 },
+        { "id": "win-bedroom-2", "kind": "window", "wallId": "w-ext-east", "offsetCm": 60, "widthCm": 150 },
+        { "id": "win-bathroom", "kind": "window", "wallId": "w-ext-east", "offsetCm": 270, "widthCm": 60 },
+        { "id": "win-bedroom-1", "kind": "window", "wallId": "w-ext-east", "offsetCm": 420, "widthCm": 150 }
+      ]
+    }
+  ]
+}
